@@ -149,8 +149,6 @@ root@vm1:/etc/ldap# ldapsearch -x -b "ou=People,dc=example,dc=com" "(objectClass
 ```
 ожидаемый результат:
 ```BASH
-dn:cn=admin,dc=example,dc=com
-root@vm1:/etc/ldap# ldapsearch -x -b "ou=People,dc=example,dc=com" "(objectClass=inetOrgPerson)"
 # extended LDIF
 #
 # LDAPv3
@@ -234,3 +232,189 @@ result: 0 Success
 1) Создал переменные (в идеале и их хранилище) для того, чтобы хранить основные данные.
 2) Менял бы не весь конфиг, а только те строчки, которые нас интересуют.
 3) Больше времени на прочтение документации, чтобы можно было найти какие-либо варианты для оптимизации взаимодействия с данным пакетом.
+
+Полный вывод запуска плейбука и тестов на ноде:
+* На мастере
+```BASH
+local@sher-pc:~/Documents/ansible$ ansible-playbook playbook.yml -i hosts.txt 
+
+PLAY [Install OpenLDAP] ****************************************************************************************************************************************
+
+TASK [Gathering Facts] *****************************************************************************************************************************************
+ok: [ubuntu1]
+
+TASK [OpenLDAP : include_tasks] ********************************************************************************************************************************
+included: /home/local/Documents/ansible/OpenLDAP/tasks/installing_ldap.yml for ubuntu1
+
+TASK [OpenLDAP : Update apt cache] *****************************************************************************************************************************
+changed: [ubuntu1]
+
+TASK [OpenLDAP : Deleting old Openldap] ************************************************************************************************************************
+changed: [ubuntu1]
+
+TASK [OpenLDAP : Install OpenLDAP] *****************************************************************************************************************************
+changed: [ubuntu1]
+
+TASK [OpenLDAP : Ensure slapd is running and enabled] **********************************************************************************************************
+ok: [ubuntu1]
+
+TASK [OpenLDAP : include_tasks] ********************************************************************************************************************************
+included: /home/local/Documents/ansible/OpenLDAP/tasks/configure_ldap.yml for ubuntu1
+
+TASK [OpenLDAP : Replacing config] *****************************************************************************************************************************
+changed: [ubuntu1]
+
+TASK [OpenLDAP : Restarting slapd] *****************************************************************************************************************************
+changed: [ubuntu1]
+
+TASK [OpenLDAP : Loading root base file] ***********************************************************************************************************************
+ok: [ubuntu1]
+
+TASK [OpenLDAP : Adding root base file] ************************************************************************************************************************
+changed: [ubuntu1]
+
+TASK [OpenLDAP : include_tasks] ********************************************************************************************************************************
+included: /home/local/Documents/ansible/OpenLDAP/tasks/adding_users.yml for ubuntu1
+
+TASK [OpenLDAP : Loading users file] ***************************************************************************************************************************
+ok: [ubuntu1]
+
+TASK [OpenLDAP : Adding users] *********************************************************************************************************************************
+changed: [ubuntu1]
+
+TASK [OpenLDAP : include_tasks] ********************************************************************************************************************************
+included: /home/local/Documents/ansible/OpenLDAP/tasks/adding_groups.yml for ubuntu1
+
+TASK [OpenLDAP : Loading groups file] **************************************************************************************************************************
+ok: [ubuntu1]
+
+TASK [OpenLDAP : Adding groups] ********************************************************************************************************************************
+changed: [ubuntu1]
+
+PLAY RECAP *****************************************************************************************************************************************************
+ubuntu1                    : ok=17   changed=8    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
+```
+
+* На ноде:
+```BASH
+ldapsearch -Q -Y EXTERNAL -H ldapi:/// -b cn=config "(olcDatabase={1}mdb)" olcSuffix olcRootDN olcRootPW
+# extended LDIF
+#
+# LDAPv3
+# base <cn=config> with scope subtree
+# filter: (olcDatabase={1}mdb)
+# requesting: olcSuffix olcRootDN olcRootPW 
+#
+
+# {1}mdb, config
+dn: olcDatabase={1}mdb,cn=config
+olcSuffix: dc=example,dc=com
+olcRootDN: cn=admin,dc=example,dc=com
+olcRootPW: {SSHA}J3s1NeRgOzXocPinAkRRAzNHUmJHhr0z
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 2
+# numEntries: 1
+
+root@vm1:/etc/ldap# ldapwhoami -x -H ldap:/// -D "cn=admin,dc=example,dc=com" -w "changeme"
+dn:cn=admin,dc=example,dc=com
+
+root@vm1:/etc/ldap# ldapsearch -x -b "dc=example,dc=com" -s base "(objectClass=organization)"
+# extended LDIF
+#
+# LDAPv3
+# base <dc=example,dc=com> with scope baseObject
+# filter: (objectClass=organization)
+# requesting: ALL
+#
+
+# example.com
+dn: dc=example,dc=com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: Example Organization
+dc: example
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 2
+# numEntries: 1
+
+root@vm1:/etc/ldap# ldapsearch -x -b "ou=People,dc=example,dc=com" "(objectClass=inetOrgPerson)"
+# extended LDIF
+#
+# LDAPv3
+# base <ou=People,dc=example,dc=com> with scope subtree
+# filter: (objectClass=inetOrgPerson)
+# requesting: ALL
+#
+
+# user1, People, example.com
+dn: uid=user1,ou=People,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+uid: user1
+cn: User One
+sn: One
+givenName: User1
+mail: user1@example.com
+
+# user2, People, example.com
+dn: uid=user2,ou=People,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+uid: user2
+cn: User Two
+sn: Two
+givenName: User2
+mail: user2@example.com
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 3
+# numEntries: 2
+
+root@vm1:/etc/ldap# ldapsearch -x -b "ou=Groups,dc=example,dc=com" "(objectClass=groupOfNames)"
+# extended LDIF
+#
+# LDAPv3
+# base <ou=Groups,dc=example,dc=com> with scope subtree
+# filter: (objectClass=groupOfNames)
+# requesting: ALL
+#
+
+# group1, Groups, example.com
+dn: cn=group1,ou=Groups,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: group1
+description: First group
+member: uid=user1,ou=People,dc=example,dc=com
+
+# group2, Groups, example.com
+dn: cn=group2,ou=Groups,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: group2
+description: Second group
+member: uid=user2,ou=People,dc=example,dc=com
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 3
+# numEntries: 2
+```
