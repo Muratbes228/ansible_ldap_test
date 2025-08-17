@@ -1,0 +1,25 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Deleting old Openldap
+  apt:
+    name: slapd
+    state: absent
+    purge: yes  
+  ignore_errors: yes
+
+- name: Install OpenLDAP
+  apt:
+    name:
+      - slapd
+      - ldap-utils
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Ensure slapd is running and enabled
+  systemd:
+    name: slapd
+    state: started
+    enabled: yes

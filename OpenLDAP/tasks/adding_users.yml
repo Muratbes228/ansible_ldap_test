@@ -1,0 +1,10 @@
+- name: Loading users file
+  copy:
+    src: ../files/add_users.ldif
+    dest: /etc/ldap/add_users.ldif
+    owner: root       
+    group: root       
+    mode: '0644' 
+
+- name: Adding users
+  command: ldapadd -x -D "cn=admin,dc=example,dc=com" -w "changeme" -f /etc/ldap/add_users.ldif

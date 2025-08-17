@@ -1,0 +1,11 @@
+- name: Loading groups file
+  copy:
+    src: ../files/add_groups.ldif
+    dest: /etc/ldap/add_groups.ldif
+    owner: root       
+    group: root       
+    mode: '0644' 
+
+- name: Adding groups
+  command: ldapadd -x -D "cn=admin,dc=example,dc=com" -w "changeme" -f /etc/ldap/add_groups.ldif
+

@@ -1,0 +1,5 @@
+- name: Install OpenLDAP
+  hosts: test
+  become: yes
+  roles:
+      - OpenLDAP

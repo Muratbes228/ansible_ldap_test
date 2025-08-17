@@ -1,0 +1,18 @@
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+description: Groups container
+
+dn: cn=group1,ou=Groups,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: group1
+description: First group
+member: uid=user1,ou=People,dc=example,dc=com
+
+dn: cn=group2,ou=Groups,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: group2
+description: Second group
+member: uid=user2,ou=People,dc=example,dc=com

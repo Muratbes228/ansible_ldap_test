@@ -1,0 +1,28 @@
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+description: Users container
+
+dn: uid=user1,ou=People,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+uid: user1
+cn: User One
+sn: One
+givenName: User1
+mail: user1@example.com
+userPassword: {SSHA}BU2OpGp0zBZt1cal8GLm8WtDhFkhRZVK
+
+dn: uid=user2,ou=People,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+uid: user2
+cn: User Two
+sn: Two
+givenName: User2
+mail: user2@example.com
+userPassword: {SSHA}X0HapF8+CGWdDi+m2q/A9tCiBSaR9Up8

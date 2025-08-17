@@ -1,0 +1,25 @@
+- name: Replacing config
+  copy:
+    src: ../files/ldap_config.ldif
+    dest: /etc/ldap/slapd.d/cn=config/olcDatabase={1}mdb.ldif
+    owner: root       
+    group: root       
+    mode: '0644' 
+
+- name: Restarting slapd
+  systemd:
+    name: slapd
+    state: restarted
+
+- name: Loading root base file
+  copy:
+    src: ../files/init_root.ldif
+    dest: /etc/ldap/init_root.ldif
+    owner: root       
+    group: root       
+    mode: '0644' 
+
+- name: Adding root base file
+  command: ldapadd -x -D "cn=admin,dc=example,dc=com" -w "changeme" -f /etc/ldap/init_root.ldif
+
+

@@ -1,0 +1,12 @@
+---
+# tasks file for install OpenLDAP
+- include_tasks: installing_ldap.yml
+
+# tasks file for configure OpenLDAP
+- include_tasks: configure_ldap.yml
+
+# tasks file for adding users to OpenLDAP
+- include_tasks: adding_users.yml
+
+# tasks file for adding groups to Openldap
+- include_tasks: adding_groups.yml
