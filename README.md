@@ -108,7 +108,7 @@ result: 0 Success
 ```
 2) Админский доступ:
 ```BASH
-root@vm1:/etc/ldap# ldapwhoami -x -H ldap:/// -D "cn=admin,dc=example,dc=com" -w "changeme"
+ldapwhoami -x -H ldap:/// -D "cn=admin,dc=example,dc=com" -w "changeme"
 ```
 ожидаемый результат:
 ```BASH
@@ -116,7 +116,7 @@ dn:cn=admin,dc=example,dc=com
 ```
 3) Наличие организации:
 ```BASH
-root@vm1:/etc/ldap# ldapsearch -x -b "dc=example,dc=com" -s base "(objectClass=organization)"
+ldapsearch -x -b "dc=example,dc=com" -s base "(objectClass=organization)"
 ```
 ожидаемый результат:
 ```BASH
@@ -145,7 +145,7 @@ result: 0 Success
 ```
 4) Добавление пользователей:
 ```BASH
-root@vm1:/etc/ldap# ldapsearch -x -b "ou=People,dc=example,dc=com" "(objectClass=inetOrgPerson)"
+ldapsearch -x -b "ou=People,dc=example,dc=com" "(objectClass=inetOrgPerson)"
 ```
 ожидаемый результат:
 ```BASH
@@ -190,7 +190,7 @@ result: 0 Success
 ```
 5) Добавление групп:
 ```BASH
-root@vm1:/etc/ldap# ldapsearch -x -b "ou=Groups,dc=example,dc=com" "(objectClass=groupOfNames)"
+ldapsearch -x -b "ou=Groups,dc=example,dc=com" "(objectClass=groupOfNames)"
 ```
 ожидаемый результат:
 ```BASH
@@ -297,7 +297,7 @@ ubuntu1                    : ok=17   changed=8    unreachable=0    failed=0    s
 
 * На ноде:
 ```BASH
-ldapsearch -Q -Y EXTERNAL -H ldapi:/// -b cn=config "(olcDatabase={1}mdb)" olcSuffix olcRootDN olcRootPW
+root@vm1:/etc/ldap# ldapsearch -Q -Y EXTERNAL -H ldapi:/// -b cn=config "(olcDatabase={1}mdb)" olcSuffix olcRootDN olcRootPW
 # extended LDIF
 #
 # LDAPv3
