@@ -1,10 +1,38 @@
-- name: Loading users file
-  copy:
-    src: ../files/add_users.ldif
-    dest: /etc/ldap/add_users.ldif
-    owner: root       
-    group: root       
-    mode: '0644' 
+- name: Create organizational unit for users
+  community.general.ldap_entry:
+    dn: "ou=users,{{ ldap_base_dn }}"
+    objectClass:
+      - organizationalUnit
+      - top
+    attributes:
+      ou: users
+    state: present
+    bind_dn: "{{ ldap_admin_dn }}"
+    bind_pw: "{{ ldap_admin_password }}"
+    server_uri: "{{ ldap_uri }}"
 
-- name: Adding users
-  command: ldapadd -x -D "cn=admin,dc=example,dc=com" -w "changeme" -f /etc/ldap/add_users.ldif
+- name: Create LDAP users
+  community.general.ldap_entry:
+    dn: "uid={{ item.username }},ou=users,{{ ldap_base_dn }}"
+    objectClass:
+      - inetOrgPerson
+      - posixAccount
+      - top
+    attributes:
+      uid: "{{ item.username }}"
+      cn: "{{ item.first_name }} {{ item.surname }}"
+      givenName: "{{ item.first_name }}"
+      sn: "{{ item.surname }}"
+      mail: "{{ item.email }}"
+      uidNumber: "{{ item.uid_number }}"
+      gidNumber: "{{ item.uid_number }}"
+      homeDirectory: "/home/{{ item.username }}"
+      loginShell: "/bin/bash"
+      userPassword: "{{ item.password }}"
+    state: present
+    bind_dn: "{{ ldap_admin_dn }}"
+    bind_pw: "{{ ldap_admin_password }}"
+    server_uri: "{{ ldap_uri }}"
+  loop: "{{ ldap_users }}"
+  loop_control:
+    label: "{{ item.username }}"

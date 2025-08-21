@@ -2,18 +2,12 @@
   apt:
     update_cache: yes
 
-- name: Deleting old Openldap
-  apt:
-    name: slapd
-    state: absent
-    purge: yes  
-  ignore_errors: yes
-
 - name: Install OpenLDAP
   apt:
     name:
       - slapd
       - ldap-utils
+      - python3-ldap
     state: present
   environment:
     DEBIAN_FRONTEND: noninteractive

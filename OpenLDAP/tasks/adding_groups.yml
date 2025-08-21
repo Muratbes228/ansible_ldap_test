@@ -1,11 +1,30 @@
-- name: Loading groups file
-  copy:
-    src: ../files/add_groups.ldif
-    dest: /etc/ldap/add_groups.ldif
-    owner: root       
-    group: root       
-    mode: '0644' 
+- name: Create organizational unit for groups
+  community.general.ldap_entry:
+    dn: "ou=groups,{{ ldap_base_dn }}"
+    objectClass:
+      - organizationalUnit
+      - top
+    attributes:
+      ou: groups
+    state: present
+    bind_dn: "{{ ldap_admin_dn }}"
+    bind_pw: "{{ ldap_admin_password }}"
+    server_uri: "{{ ldap_uri }}"
 
-- name: Adding groups
-  command: ldapadd -x -D "cn=admin,dc=example,dc=com" -w "changeme" -f /etc/ldap/add_groups.ldif
-
+- name: Create POSIX groups
+  community.general.ldap_entry:
+    dn: "cn={{ item.name }},ou=groups,{{ ldap_base_dn }}"
+    objectClass:
+      - posixGroup
+      - top
+    attributes:
+      cn: "{{ item.name }}"
+      gidNumber: "{{ item.gid }}"
+      description: "{{ item.description | default('') }}"
+    state: present
+    bind_dn: "{{ ldap_admin_dn }}"
+    bind_pw: "{{ ldap_admin_password }}"
+    server_uri: "{{ ldap_uri }}"
+  loop: "{{ ldap_groups }}"
+  loop_control:
+    label: "{{ item.name }}"

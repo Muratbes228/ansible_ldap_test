@@ -11,15 +11,18 @@
     name: slapd
     state: restarted
 
-- name: Loading root base file
-  copy:
-    src: ../files/init_root.ldif
-    dest: /etc/ldap/init_root.ldif
-    owner: root       
-    group: root       
-    mode: '0644' 
-
-- name: Adding root base file
-  command: ldapadd -x -D "cn=admin,dc=example,dc=com" -w "changeme" -f /etc/ldap/init_root.ldif
-
-
+- name: Create organization entry if it doesn't exist
+  vars:
+  community.general.ldap_entry:
+    dn: "{{ ldap_base_dn }}"
+    objectClass:
+      - organization
+      - dcObject
+      - top
+    attributes:
+      o: "{{ ldap_organization }}"
+      dc: "{{ ldap_dc }}"
+    state: present
+    bind_dn: "{{ ldap_admin_dn }}"
+    bind_pw: "{{ ldap_admin_password }}"
+    server_uri: "{{ ldap_uri }}"
