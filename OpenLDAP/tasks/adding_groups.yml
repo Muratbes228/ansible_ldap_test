@@ -1,5 +1,5 @@
 - name: Create organizational unit for groups
-  community.general.ldap_entry:
+  ldap_entry:
     dn: "ou=groups,{{ ldap_base_dn }}"
     objectClass:
       - organizationalUnit
@@ -11,15 +11,15 @@
     bind_pw: "{{ ldap_admin_password }}"
     server_uri: "{{ ldap_uri }}"
 
-- name: Create POSIX groups
-  community.general.ldap_entry:
+- name: Create groups
+  ldap_entry:
     dn: "cn={{ item.name }},ou=groups,{{ ldap_base_dn }}"
     objectClass:
-      - posixGroup
+      - groupOfNames
       - top
     attributes:
       cn: "{{ item.name }}"
-      gidNumber: "{{ item.gid }}"
+      member: "{{ item.members }}"
       description: "{{ item.description | default('') }}"
     state: present
     bind_dn: "{{ ldap_admin_dn }}"

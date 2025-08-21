@@ -23,6 +23,10 @@ ldap_groups:
   - name: "group1"
     gid: 1000
     description: "First group"
+    members:
+      - "uid=user1,ou=users,{{ ldap_base_dn }}"
   - name: "group2"
     gid: 1001
     description: "Second group"
+    members:
+      - "uid=user2,ou=users,{{ ldap_base_dn }}"

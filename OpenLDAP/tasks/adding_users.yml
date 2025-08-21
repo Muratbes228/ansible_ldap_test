@@ -1,5 +1,5 @@
 - name: Create organizational unit for users
-  community.general.ldap_entry:
+  ldap_entry:
     dn: "ou=users,{{ ldap_base_dn }}"
     objectClass:
       - organizationalUnit
@@ -12,7 +12,7 @@
     server_uri: "{{ ldap_uri }}"
 
 - name: Create LDAP users
-  community.general.ldap_entry:
+  ldap_entry:
     dn: "uid={{ item.username }},ou=users,{{ ldap_base_dn }}"
     objectClass:
       - inetOrgPerson

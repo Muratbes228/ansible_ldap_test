@@ -1,4 +1,4 @@
-- name: Replacing config
+- name: Replace config
   copy:
     src: ../files/ldap_config.ldif
     dest: /etc/ldap/slapd.d/cn=config/olcDatabase={1}mdb.ldif
@@ -6,14 +6,14 @@
     group: root       
     mode: '0644' 
 
-- name: Restarting slapd
+- name: Restart slapd
   systemd:
     name: slapd
     state: restarted
 
-- name: Create organization entry if it doesn't exist
+- name: Create root base
   vars:
-  community.general.ldap_entry:
+  ldap_entry:
     dn: "{{ ldap_base_dn }}"
     objectClass:
       - organization
